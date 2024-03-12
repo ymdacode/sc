@@ -5,7 +5,7 @@ Sample:
 ```
 (
 SynthDef.new("test-synth",
- { |freq = 440　out = #[0, 1]| Out.ar(0, SinOsc.ar(freq, 0, 0.2)) }
+ { |freq = 440　out = #[0, 1]| Out.ar(out, SinOsc.ar(freq, 0, 0.2)) }
  ).add;
 )
 x = Synth("test-synth",["freq",660]);
@@ -15,6 +15,9 @@ x.free;
 `arg freq = 440`の糖衣構文。
 SCではリテラルの配列に#をつけることに注意。
 SinOscのようなものをUnit Generator(=UGen)と呼ぶ。
+
+## オシレータの種類
+
 
 # バス
 
@@ -75,4 +78,34 @@ Synth("dataForABus");    // synthesize a sawtooth wave on channel 0
 Synth("dataFromABus");    // pair it with a sine wave on channel 1
 )
 ```
+
+# レコーディング
+
+`s.record(duration: 5);`
+引数は
+(path, bus, numChannels, node, duration)
+とあるが基本的にdurationのみ指定すればok
+
+ファイルの保存先は
+`thisProcess.platform.recordingsDir`
+という変数を変更する。
+パスはstringで、バックスラッシュはエスケープする。
+
+# フィルタ
+
+ローパスフィルタの例
+```
+(
+SynthDef("subtractive", { arg out;
+    Out.ar(
+        out,
+        LPF.ar(
+            Pulse.ar(440, 0.5, 0.1), 
+            500
+        )
+    )
+}).add;
+)
+```
+LPF.arは、第一引数が入力信号、第二引数がカットオフする周波数となる。
 
